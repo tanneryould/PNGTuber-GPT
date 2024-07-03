@@ -1635,7 +1635,17 @@ public class CPHInline
             // Read the existing file content and update it with the new user information.
             string jsonContent = File.ReadAllText(filePath);
             var userContexts = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
-            userContexts[userName] = messageToRemember;
+
+            // Append the new message to the existing value if the key already exists.
+            if (userContexts.ContainsKey(userName))
+            {
+                userContexts[userName] = userContexts[userName] + "; " + messageToRemember;
+            }
+            else
+            {
+                userContexts[userName] = messageToRemember;
+            }
+            
             // Write the updated dictionary back to the file.
             File.WriteAllText(filePath, JsonConvert.SerializeObject(userContexts, Formatting.Indented));
             LogToFile($"Information about user '{userName}' saved: {messageToRemember}", "INFO");
